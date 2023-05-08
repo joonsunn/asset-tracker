@@ -7,7 +7,7 @@ const middleware = require('../utils/middleware')
 
 assetsRouter.get('/', async (request, response) => {
 
-	const assets = await Asset.find({}).populate('user', { username: 1, name: 1, id: 1 })
+	const assets = await Asset.find({})
 	return response.json(assets)
 })
 
@@ -30,6 +30,26 @@ assetsRouter.get('/:id', async (request, response) => {
 		response.status(404).end()
 	}
 })
+
+assetsRouter.get('/byUser/:id', async (request, response) => {
+	// const user = request.user
+
+	// if (!user) {
+	// 	return response.status(401).end()
+	// }
+
+	const userId = request.params.id
+
+	const assets = await Asset.find({})
+	const userAssets = assets.filter(asset => asset.user.toString() === userId)
+
+	if (userAssets) {
+		response.json(userAssets)
+	} else {
+		response.status(404).end
+	}
+})
+
 assetsRouter.post('/', [middleware.tokenExtractor, middleware.userExtractor], async (request, response) => {
 	const user = request.user
 
@@ -48,7 +68,6 @@ assetsRouter.post('/', [middleware.tokenExtractor, middleware.userExtractor], as
 		assetCurrency: body.assetCurrency,
 		user: user.id
 	})
-
 	const savedAsset = await asset.save()
 	user.assets = user.assets.concat(savedAsset._id)
 	await user.save()

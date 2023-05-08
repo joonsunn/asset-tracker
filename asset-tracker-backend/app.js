@@ -10,6 +10,7 @@ const transactionsRouter = require('./controllers/transactions')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
+const assetSearchRouter = require('./controllers/assetSearch')
 
 mongoose.set('strictQuery', false)
 
@@ -34,6 +35,7 @@ app.use('/api/login', loginRouter)
 // app.use(middleware.userExtractor)
 app.use('/api/users', usersRouter)
 app.use('/api/transactions', transactionsRouter)
+app.use('/api/assetSearch', assetSearchRouter)
 
 if(process.env.NODE_ENV === 'test'){
 	const testingRouter = require('./controllers/testing')

@@ -20,7 +20,8 @@ const DisplayAsset = forwardRef(({ userAssets, assetId, userTransactions, keyind
 	return (
 		<div>
 			{userAssets.map(asset => asset.id === assetId 
-						? <AssetHeader asset = {asset} assetKey = {assetId} userTransactions={userTransactions} key = {keyindex} handleShowTransactions={toggleVisibility}></AssetHeader>
+						? <AssetHeader asset = {asset} assetKey = {assetId} userTransactions={userTransactions} key = {keyindex} handleShowTransactions={toggleVisibility}>
+						</AssetHeader>
 						: null)}
 			<div style = {showWhenVisible}>
 				<TransactionsTable userTransactions={userTransactions} assetId = {assetId}></TransactionsTable>

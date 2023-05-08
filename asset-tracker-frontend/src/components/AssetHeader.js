@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import _ from 'lodash'
 
-const AssetHeader = ({ asset, assetKey, userTransactions, handleShowTransactions }) => {
+const AssetHeader = ({ asset, assetKey, userTransactions, handleShowTransactions}) => {
 	
 	const totalUnits = _.sumBy(userTransactions[assetKey], 'transactedUnits')
 	const costBasisUnit = _.sumBy(userTransactions[assetKey], x => x.transactedPrice * x.transactedUnits) / _.sumBy(userTransactions[assetKey], 'transactedUnits')
 	const costBasis = _.sumBy(userTransactions[assetKey], x => x.transactedPrice * x.transactedUnits)
 	const currentValue = (asset.assetCurrentPrice * _.sumBy(userTransactions[assetKey], 'transactedUnits'))
 	const profitLoss = (currentValue - costBasis)/costBasis
+	const assetHasTransactions = !!userTransactions[assetKey]
+
 	
 	return (
 		<div className='assetHeader'>
@@ -28,7 +30,9 @@ const AssetHeader = ({ asset, assetKey, userTransactions, handleShowTransactions
 						<th>Cost Basis</th>
 						<th>Current Value</th>
 						<th>P/L</th>
+						{assetHasTransactions && 
 						<th><button onClick={handleShowTransactions}>Show Transactions</button></th>
+						}
 					</tr>
 				</thead>
 				<tbody>

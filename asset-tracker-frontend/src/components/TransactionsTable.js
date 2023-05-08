@@ -43,10 +43,12 @@ const TransactionsTable = forwardRef( ({userTransactions, assetId}, refs) => {
 		return { toggleVisibility }
 	})
 
+	const assetHasTransactions = userTransactions[assetId] != null
+
 	return (
-		<div>
-			{/* <button onClick={toggleVisibility}>Show</button> */}
-			<div style={showWhenVisible}>
+		<div style={showWhenVisible}>
+			{assetHasTransactions &&
+			<div>
 				<table>
 					<thead>
 						<tr>
@@ -59,7 +61,7 @@ const TransactionsTable = forwardRef( ({userTransactions, assetId}, refs) => {
 						</tr>
 					</thead>
 					<tbody>
-						{userTransactions[assetId].map((transaction, index) => {return(
+						{assetHasTransactions && userTransactions[assetId].map((transaction, index) => {return(
 						<tr key = {index}>
 							<td key = 'date'>{transaction.transactionDate}</td>
 							<td key = 'price'>{transaction.transactedPrice}</td>
@@ -72,9 +74,7 @@ const TransactionsTable = forwardRef( ({userTransactions, assetId}, refs) => {
 					</tbody>
 				</table>
 			</div>
-			<div>
-				
-			</div>
+			}
 		</div>
 		
 	)

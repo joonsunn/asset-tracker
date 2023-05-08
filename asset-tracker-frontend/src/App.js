@@ -7,6 +7,10 @@ import TransactionsTable from './components/TransactionsTable';
 import AssetHeader from './components/AssetHeader';
 import DisplayAsset from './components/DisplayAsset';
 import Togglable from './components/Togglable';
+import loginService from './services/login'
+import assetsService from './services/assets'
+import LoginForm from './components/LoginForm';
+import AddAsset from './components/AddAsset';
 
 function App() {
 	const [transactions, setTransactions] = useState([])
@@ -16,6 +20,7 @@ function App() {
 	const [errorType, setErrorType] = useState(null)
 	const [userTransactions, setUserTransactions] = useState([])
 	const [userAssets, setUserAssets] = useState([])
+	const [userId, setUserId] = useState(null)
 
 	const promptMessage = (message, errorType) => {
 		setErrorType(errorType)
@@ -26,95 +31,116 @@ function App() {
 		}, 5000)
 	}
 
-	const userId = process.env.REACT_APP_USERID
+	// const userId = process.env.REACT_APP_USERID
+
+	// const userId = user.id
 
 	// const transactionTableRef = useRef()
 
 	useEffect(() => {
-		// const getTransactions = async () => {
-		// 	const getTransactions = await axios.get('/api/transactions')
-		// 	const filteredTransactions = getTransactions.data.filter(transaction => transaction.user === userId)
-		// 	setTransactions(filteredTransactions)
-		// }
-		// getTransactions()
-
-		// const getAssets = async () => {
-		// 	const getAssets = await axios.get('/api/assets')
-		// 	const filteredAssets = getAssets.data.filter(asset => asset.user === userId)
-		// 	setAssets(filteredAssets)
-		// }
-		// getAssets()
-
-		const getUserAssets = async () => {
-			const getUserAssets = await axios.get(`/api/assets/byuser/${userId}`)
-			setUserAssets(getUserAssets.data)
-		}
-
 		getUserAssets()
-
-
-		const getUserTransactions = async () => {
-			const getUserTransactions = await axios.get(`/api/transactions/byuser/${userId}`)
-			setUserTransactions(getUserTransactions.data)
-		}
 		getUserTransactions()
+	}, [userId])
+	// console.log(user)
 
+	const getUserAssets = async () => {
+		const getUserAssets = await axios.get(`/api/assets/byuser/${userId}`)
+		// const getUserAssets = await assetsService.getUserAssets(userId)
+		setUserAssets(getUserAssets.data)
+	}
 
+	const getUserTransactions = async () => {
+		const getUserTransactions = await axios.get(`/api/transactions/byuser/${userId}`)
+		// const getUserTransactions = await assetsService.getUserTransactions(userId)
+		setUserTransactions(getUserTransactions.data)
+	}
+
+	useEffect(() => {
+		const loggedUserJSON = window.localStorage.getItem('loggedAssetAppUser')
+		if (loggedUserJSON) {
+			const user = JSON.parse(loggedUserJSON)
+			setUser(user)
+			setUserId(process.env.REACT_APP_USERID)
+			assetsService.setToken(user.token)
+			// console.log(userId)
+			// console.log(process.env.REACT_APP_USERID)
+			// getUserAssets()
+			// getUserTransactions()
+
+		}
 	}, [])
-	
-	// const handleShowTransactions = () => {
-	// 	transactionTableRef.current.toggleVisibility()
-	// }
 
-	// const DisplayAsset = ({ userAssets, assetId, userTransactions, keyindex }) => {
-	// 	return (
-	// 		<div>
-	// 			{userAssets.map(asset => asset.id === assetId 
-	// 						? <div>
-	// 							<AssetHeader asset = {asset} assetKey = {assetId} userTransactions={userTransactions} key = {keyindex} handleShowTransactions={handleShowTransactions}></AssetHeader>
-	// 							<Togglable ref={transactionTableRef}>
-	// 								<TransactionsTable userTransactions={userTransactions} assetId = {assetId}></TransactionsTable>
-	// 							</Togglable>
-	// 						</div> 
-	// 						: null)}
-	// 			{/* <button onClick={handleShowTransactions}>show</button> */}
-	// 		</div>
-	// 	)
-	// }
+	const handleLogin = async (userObject) => {
+		// event.preventDefault()
 
+		try {
+			const user = await loginService.login(userObject)
+			window.localStorage.setItem(
+				'loggedAssetAppUser', JSON.stringify(user)
+			)
+			assetsService.setToken(user.token)
+			setUser(user)
+			// setUsername('')
+			// setPassword('')
+			getUserAssets()
+			getUserTransactions()
 
+			promptMessage(`Welcome ${user.name}`, false)
+
+		} catch (exception) {
+			// console.log(exception)
+			promptMessage('Unable to login. username/password does not exist', true)
+		}
+	}
+
+	const handleLogout = () => {
+		try {
+			window.localStorage.removeItem('loggedAssetAppUser')
+			setUser(null)
+			promptMessage('Successfully logged out', false)
+		} catch (exception) {
+			console.log(exception)
+		}
+	}
 	
 	return (
     <div className="App">
-		{/* <div>
-			Transactions:
-			{transactions.map(transaction => {return <div>{transaction.id}</div>})}
-		</div>
-		<div>
-			Assets:
-			{assets.map(asset => {return <div>{asset.assetName} {asset.assetTicker} {asset.assetHoldingUnits} {asset.assetCurrentPrice} {asset.assetTransactions.map(transaction => <div>{transaction}</div>)}</div>})}
-		</div> */}
-		{/* <div> */}
-			User Assets:
-			{Object.keys(userTransactions).map((assetId, keyindex) => {
-				return(
-				<div key = {keyindex} className='asset'>
-					{/* {assets.map(asset => asset.id === key ? <div key = {keyindex}>{asset.id} {asset.assetName} {asset.assetTicker} {asset.assetClass} {asset.assetCurrentPrice} Cost basis: { _.sumBy(userTransactions[key], x => x.transactedPrice * x.transactedUnits) / _.sumBy(userTransactions[key], 'transactedUnits')} Total units: {_.sumBy(userTransactions[key], 'transactedUnits')} Current value: {(asset.assetCurrentPrice * _.sumBy(userTransactions[key], 'transactedUnits')).toFixed(2)} P/L: {((asset.assetCurrentPrice - (_.sumBy(userTransactions[key], x => x.transactedPrice * x.transactedUnits) / _.sumBy(userTransactions[key], 'transactedUnits')))/((_.sumBy(userTransactions[key], x => x.transactedPrice * x.transactedUnits) / _.sumBy(userTransactions[key], 'transactedUnits')))).toFixed(2)}%</div> : null)} */}
+			{!user && 
+			<div>
+				Login to Asset Tracker:
+				<LoginForm handleLogin={handleLogin}></LoginForm>
+			</div>
+			}
+
+			{user && 
+			
+				<div>
+					<button onClick={handleLogout}>Logout</button>
+					<AddAsset></AddAsset>
+					User Assets:
+				{/* {Object.keys(userTransactions).map((assetId, keyindex) => {
+					return(
+						<div key = {keyindex} className='asset'>
+						
+						<DisplayAsset userAssets={userAssets} assetId = {assetId} userTransactions={userTransactions} keyindex={keyindex}></DisplayAsset>
+						
+						</div>
+						)
+					})}
 					
-					{/* {userAssets.map(asset => asset.id === assetId 
-						? <AssetHeader asset = {asset} assetKey = {assetId} userTransactions={userTransactions} key = {keyindex}></AssetHeader>
-						: null)}
+				V2: */}
 
-					<TransactionsTable userTransactions={userTransactions} assetId = {assetId}></TransactionsTable> */}
-
-					<DisplayAsset userAssets={userAssets} assetId = {assetId} userTransactions={userTransactions} keyindex={keyindex}></DisplayAsset>
-
+				{Object.keys(userAssets).map((assetIndex, keyindex) => {
+					// console.log(userAssets[assetIndex].id)
+					const id = userAssets[assetIndex].id
+					return (
+						<div key = {userAssets[assetIndex].id} className='asset'>
+							<DisplayAsset userAssets = {userAssets} assetId = {id} userTransactions = {userTransactions} keyindex={keyindex}></DisplayAsset>
+						</div>
+					)
+				})}
 				</div>
-				)
-			})}
-
-
-		{/* </div> */}
+			}
 
     </div>
   );

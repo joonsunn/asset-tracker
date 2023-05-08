@@ -9,6 +9,28 @@ const setToken = (newToken) => {
 	token = `Bearer ${newToken}`
 }
 
+const getUserAssets = async (id) => {
+	const config = {
+		headers : {
+			Authorization: token
+		}
+	}
+
+	const response = await axios.get(`${assetsUrl}/byuser/${id}`)
+	return response.data
+}
+
+const getUserTransactions = async (id) => {
+	const config = {
+		headers : {
+			Authorization: token
+		}
+	}
+
+	const response = await axios.get(`${transactionsUrl}/byuser/${id}`)
+	return response.data
+}
+
 const getAll = async () => {
 	const response = await axios.get(baseUrl)
 	return response.data
