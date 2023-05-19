@@ -75,6 +75,7 @@ transactionsRouter.post('/', [middleware.tokenExtractor, middleware.userExtracto
 		transactedPrice: body.transactedPrice,
 		transactedUnits: body.transactedUnits,
 		transactionDirection: body.transactionDirection,
+		//TODO: add transaction currency
 		user: user.id
 	})
 

@@ -68,7 +68,7 @@ const TransactionsTable = forwardRef( ({userTransactions, assetId}, refs) => {
 							<td key = 'units'>{transaction.transactedUnits}</td>
 							<td key = 'direction'>{transaction.transactionDirection}</td>
 							<td key = 'id'>{transaction.id}</td>
-							<td key = 'amend'><button>Modify</button><button>Delete</button></td>
+							<td key = 'amend'><button onClick={event => {event.preventDefault(); console.log(`Simulating amending transaction ${transaction.id} of asset ${assetId}`)}}>Modify</button><button onClick={event => {event.preventDefault(); console.log(`Simulating deleting transaction ${transaction.id} of asset ${assetId}`)}}>Delete</button></td>
 						</tr>
 					)})}
 					</tbody>

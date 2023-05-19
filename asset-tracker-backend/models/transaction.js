@@ -30,6 +30,8 @@ const transactionSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User'
 	}
+
+	//TODO: add transaction currency
 })
 
 transactionSchema.set('toJSON', {
