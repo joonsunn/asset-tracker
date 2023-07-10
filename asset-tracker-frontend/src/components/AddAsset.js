@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import assetsService from '../services/assets'
 import { symbol } from "prop-types";
+import App from "../App";
 
 
 const SearchResultDataRow = ({item}) => {
@@ -31,6 +32,8 @@ const SearchResultDataRow = ({item}) => {
 	const addAsset = async (symbolToBeAdded) => {
 		const response = await assetsService.addAsset(symbolToBeAdded)
 		console.log(response)
+		
+		
 	}
 	
 	return (
